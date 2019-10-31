@@ -10,11 +10,11 @@
 #include "pins_arduino.h"
 
 #include "Arduino.h"
-#include "DmxSimple.h"
+#include "DmxSimpleCustom.h"
 
 /** dmxBuffer contains a software copy of all the DMX channels.
   */
-volatile uint8_t dmxBuffer[DMX_SIZE];
+volatile uint8_t dmxBuffer[DMX_SIZE + 18]; // <--- [CUSTOMIZED for ArtNet header]
 static uint16_t dmxMax = 16; /* Default to sending the first 16 channels */
 static uint8_t dmxStarted = 0;
 static uint16_t dmxState = 0;
@@ -222,7 +222,7 @@ ISR(ISR_NAME,ISR_NOBLOCK) {
       // Now send a channel which takes 11 bit periods
       if (bitsLeft < 11) break;
       bitsLeft-=11;
-      dmxSendByte(dmxBuffer[dmxState-1]);
+      dmxSendByte(dmxBuffer[dmxState-1 + 18]); // <--- [CUSTOMIZED for ArtNet header]
     }
     // Successfully completed that stage - move state machine forward
     dmxState++;
@@ -242,7 +242,7 @@ void dmxWrite(int channel, uint8_t value) {
     if (value<0) value=0;
     if (value>255) value=255;
     dmxMax = max((unsigned)channel, dmxMax);
-    dmxBuffer[channel-1] = value;
+    dmxBuffer[channel-1 + 18] = value; // <--- [CUSTOMIZED for ArtNet header]
   }
 }
 
@@ -287,3 +287,7 @@ void DmxSimpleClass::write(int address, uint8_t value)
 	dmxWrite(address, value);
 }
 DmxSimpleClass DmxSimple;
+
+uint8_t* DmxSimpleClass::getBuffer() {
+  return dmxBuffer;
+}

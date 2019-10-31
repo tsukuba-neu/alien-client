@@ -16,7 +16,7 @@
 #define DMX_SIZE 512
 #endif
 */
-#define DMX_SIZE 32
+#define DMX_SIZE 512
 
 class DmxSimpleClass
 {
@@ -24,6 +24,7 @@ class DmxSimpleClass
     void maxChannel(int);
     void write(int, uint8_t);
     void usePin(uint8_t);
+    uint8_t* getBuffer();
 };
 extern DmxSimpleClass DmxSimple;
 
